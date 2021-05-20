@@ -1,0 +1,51 @@
+﻿@page "/Data"
+
+@using WebDoAn.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Bảng Số Liệu Chất Lượng Nguồn Nước Thải Công Nghiệp</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Độ Đục. (NTU)</th>
+                <th>Nhiệt Độ. (C)</th>
+                <th>Nhiệt Độ. (F)</th>
+                <th>pH. </th>
+                <th>Lưu Lượng. (m3)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+            <tr>
+                <td>@forecast.Date.ToShortDateString()</td>
+                <td>@forecast.doDuc</td>
+                <td>@forecast.TemperatureC</td>
+                <td>@forecast.TemperatureF</td>
+                <td>@forecast.pH</td>
+                <td>@forecast.luuLuong</td>
+               
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}
