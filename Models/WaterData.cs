@@ -11,6 +11,9 @@ namespace WebDoAn.Models
         public string MessageId { get; set; }
         public DateTime Time { get; set; }
         public string Temperature { get; set; }
+        public string TemperatureF { 
+            get{ return (double.Parse(Temperature) * 1.8 + 32).ToString(); } 
+            }
         public string Turbidity { get; set; }
         public string PH { get; set; }
         public string Waterflow { get; set; }

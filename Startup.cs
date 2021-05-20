@@ -1,3 +1,4 @@
+using BlazorDownloadFile;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,8 @@ namespace WebDoAn
             services.AddSingleton<IWaterService, WaterService>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazorDownloadFile();
+
             services.AddSingleton<WeatherForecastService>();
         }
 

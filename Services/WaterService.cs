@@ -1,8 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using TableDependency.SqlClient;
+using TableDependency.SqlClient.Base.EventArgs;
 using WebDoAn.Interfaces;
 using WebDoAn.Models;
 
@@ -47,6 +51,43 @@ namespace WebDoAn.Services
             }
         }
 
+        public IList<WaterData> GetWater(DateTime startDate, DateTime endDate)
+        {
+            var result = new List<WaterData>();
+
+            using (var sqlConnection = new SqlConnection(_configuration["ConnectionString"]))
+            {
+                sqlConnection.Open();
+
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    command.CommandText = "SELECT * FROM " + TableName +" WHERE Time >='"+startDate.ToString("yyyy-MM-dd") + "' AND "+"Time <='"+endDate.ToString("yyyy-MM-dd") + "'";
+                    command.CommandType = CommandType.Text;
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                result.Add(new WaterData
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                    MessageId = reader.GetString(reader.GetOrdinal("MessageId")),
+                                    Time = reader.GetDateTime(reader.GetOrdinal("Time")),
+                                    Temperature = reader.GetString(reader.GetOrdinal("Temperature")),
+                                    Turbidity = reader.GetString(reader.GetOrdinal("Turbidity")),
+                                    PH = reader.GetString(reader.GetOrdinal("PH")),
+                                    Waterflow = reader.GetString(reader.GetOrdinal("Waterflow"))
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
         public IList<WaterData> GetCurrentWater()
         {
             var result = new List<WaterData>();

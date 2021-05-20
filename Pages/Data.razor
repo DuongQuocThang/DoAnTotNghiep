@@ -1,13 +1,20 @@
 ﻿@page "/Data"
 
 @using WebDoAn.Data
+@using WebDoAn.Interfaces
+@using WebDoAn.Models
+@using WebDoAn.Services
+@using BlazorDownloadFile;
+@inject IWaterService _waterService
 @inject WeatherForecastService ForecastService
+
 
 <h1>Bảng Số Liệu Chất Lượng Nguồn Nước Thải Công Nghiệp</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
-
-@if (forecasts == null)
+<button class="btn btn-primary" @onclick="@(() => { showFileExportModal = true; })">Xuất file</button>
+<button class="btn btn-primary">Thống kê</button>
+@if (waters == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -25,27 +32,136 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var water in waters)
             {
-            <tr>
-                <td>@forecast.Date.ToShortDateString()</td>
-                <td>@forecast.doDuc</td>
-                <td>@forecast.TemperatureC</td>
-                <td>@forecast.TemperatureF</td>
-                <td>@forecast.pH</td>
-                <td>@forecast.luuLuong</td>
-               
-            </tr>
+                <tr>
+                    <td>@water.Time.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@water.Turbidity</td>
+                    <td>@water.Temperature</td>
+                    <td>@string.Format("{0:0.00}", double.Parse(water.TemperatureF))</td>
+                    <td>@water.PH</td>
+                    <td>@water.Waterflow</td>
+
+                </tr>
             }
         </tbody>
     </table>
 }
+@if (showFileExportModal || showStatisticalModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    @if (showFileExportModal)
+                    {
+                        <h5 class="modal-title">Xuất file</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@(() => { showFileExportModal = false; })">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    }
+                    @if (showStatisticalModal)
+                    {
+                        <h5 class="modal-title">Thống kê</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@(() => { showStatisticalModal = false; })">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    }
+                </div>
+                <div class="modal-body">
+                    @if (showFileExportModal)
+                    {
+
+                        <label>Từ ngày</label>
+                        <input style="width:30%" type="date" @bind="@startDate">
+                        <label>Đến ngày</label>
+                        <input style="width:30%" type="date" @bind="@endDate" min="@startDate.ToString("yyyy-MM-dd")">
+                    }
+                    @if (showStatisticalModal)
+                    {
+
+                    }
+                </div>
+                <div class="modal-footer">
+                    @if (showFileExportModal)
+                    {
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => { showFileExportModal = false; })">Hủy</button>
+                        <button type="button" class="btn btn-primary" @onclick="FileExport">Xuất</button>
+                    }
+                    @if (showStatisticalModal)
+                    {
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => { showStatisticalModal = false; })">Hủy</button>
+                        <button type="button" class="btn btn-primary" @onclick="Statistical">Xuất</button>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
 
 @code {
-    private WeatherForecast[] forecasts;
+    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    bool showFileExportModal = false;
+    bool showStatisticalModal = false;
+    IList<WaterData> waters;
 
-    protected override async Task OnInitializedAsync()
+    DateTime startDate = DateTime.Today;
+    DateTime endDate = DateTime.Today;
+
+
+    protected override void OnInitialized()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        // Subscription to table record change events
+        this._waterService.OnWaterChanged += this.WaterChanged;
+        this.waters = this._waterService.GetCurrentWater();
+        waters = waters.OrderByDescending(c => c.Time).Take(10).ToList();
+    }
+
+    private async void WaterChanged(object sender, WaterChangeEventArgs args)
+    {
+        var recordToupdate = this.waters.FirstOrDefault(x => x.ID == args.NewWater.ID);
+
+        if (recordToupdate == null)
+        {
+            this.waters.Add(args.NewWater);
+            waters = waters.OrderByDescending(c => c.Time).Take(10).ToList();
+        }
+        else
+        {
+            recordToupdate.Waterflow = args.NewWater.Waterflow;
+            recordToupdate.Temperature = args.NewWater.Temperature;
+            recordToupdate.PH = args.NewWater.PH;
+            recordToupdate.Turbidity = args.NewWater.Turbidity;
+
+        }
+        await InvokeAsync(() =>
+        {
+            base.StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        this._waterService.OnWaterChanged -= this.WaterChanged;
+    }
+
+    public async Task FileExport()
+    {
+        var listWater = _waterService.GetWater(startDate, endDate);
+
+        var buildler = new System.Text.StringBuilder();
+        buildler.AppendLine("Time,MessageId,Temperature,TemperatureF,Turbidity,pH,WaterFlow");
+        foreach (var water in listWater)
+        {
+            buildler.AppendLine($"{water.Time},{water.MessageId},{water.Temperature},{water.TemperatureF},{water.Turbidity},{water.PH},{water.Waterflow}");
+        }
+        await BlazorDownloadFileService.DownloadFileFromText($"water{startDate.ToString("dd-MM-yyyy")}to{endDate.ToString("dd-MM-yyyy")}.csv", buildler.ToString(), "text/csv");
+    }
+    public void Statistical()
+    {
     }
 }

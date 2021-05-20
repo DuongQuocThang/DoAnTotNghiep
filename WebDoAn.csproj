@@ -5,11 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorDownloadFile" Version="2.1.6" />
     <PackageReference Include="bootstrap" Version="5.0.0-beta3" />
     <PackageReference Include="Chart.js" Version="2.9.3" />
     <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
     <PackageReference Include="FontAwesome" Version="4.7.0" />
     <PackageReference Include="LineChart" Version="1.0.1" />
+    <PackageReference Include="SqlTableDependency" Version="8.5.8" />
   </ItemGroup>
 
 </Project>

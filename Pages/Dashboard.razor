@@ -1,4 +1,13 @@
 ﻿@page "/Dashboard"
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Util
+@using WebDoAn.Interfaces
+@using WebDoAn.Models
+@using WebDoAn.Services
+@inject IWaterService _waterService
 <section>
     <!-- sidebar menu start -->
     <div class="sidebar-menu sticky-sidebar-menu">
@@ -75,7 +84,8 @@
                             <div class="card-body">
                                 <!-- bar chart -->
                                 <div id="container">
-                                    <canvas id="barchart"></canvas>
+                                    @*<canvas id="barchart"></canvas>*@
+                                    <Chart Config="_config" @ref="_chart"></Chart>
                                 </div>
                                 <!-- //bar chart -->
                             </div>
@@ -95,4 +105,111 @@
     </div>
     <!-- main content end-->
 </section>
+
+@code{
+    IList<WaterData> waters;
+    private BarConfig _config;
+    private Chart _chart;
+    BarDataset<double> waterFlowDataset;
+    BarDataset<double> pHDataSet;
+    BarDataset<double> temDataSet;
+
+    protected override void OnInitialized()
+    {
+        // Subscription to table record change events
+        this._waterService.OnWaterChanged += this.WaterChanged;
+        this.waters = this._waterService.GetCurrentWater();
+
+        _config = new BarConfig
+        {
+            Options = new BarOptions
+            {
+                Responsive = true,
+                Legend = new Legend
+                {
+                    Position = Position.Top
+                },
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Biểu đồ lượng nước"
+                }
+            }
+        };
+
+        foreach (var water in waters)
+        {
+            _config.Data.Labels.Add(water.Time.ToString());
+        }
+        waterFlowDataset = new BarDataset<double>(waters.Select(x => double.Parse(x.Waterflow)).ToArray())
+        {
+            Label = "Lưu lượng",
+            BackgroundColor = ColorUtil.ColorHexString(255, 177, 193),
+            BorderColor = ColorUtil.ColorHexString(255, 177, 193),
+            BorderWidth = 1
+        };
+        pHDataSet = new BarDataset<double>(waters.Select(x => double.Parse(x.PH)).ToArray())
+        {
+            Label = "pH",
+            BackgroundColor = ColorUtil.ColorHexString(154, 208, 245),
+            BorderColor = ColorUtil.ColorHexString(154, 208, 245),
+            BorderWidth = 1
+        };
+        temDataSet = new BarDataset<double>(waters.Select(x => double.Parse(x.Temperature)).ToArray())
+        {
+            Label = "Nhiệt độ",
+            BackgroundColor = ColorUtil.ColorHexString(255, 230, 170),
+            BorderColor = ColorUtil.ColorHexString(255, 230, 170),
+            BorderWidth = 1
+        };
+
+        _config.Data.Datasets.Add(waterFlowDataset);
+        _config.Data.Datasets.Add(pHDataSet);
+        _config.Data.Datasets.Add(temDataSet);
+    }
+
+    private void LoadChart()
+    {
+        _config.Data.Labels.Clear();
+        ((IDataset<double>)_config.Data.Datasets[0]).Clear();
+        ((IDataset<double>)_config.Data.Datasets[1]).Clear();
+        ((IDataset<double>)_config.Data.Datasets[2]).Clear();
+        foreach (var water in waters)
+        {
+            _config.Data.Labels.Add(water.Time.ToString());
+            ((IDataset<double>)_config.Data.Datasets[0]).Add(double.Parse(water.Waterflow));
+            ((IDataset<double>)_config.Data.Datasets[1]).Add(double.Parse(water.PH));
+            ((IDataset<double>)_config.Data.Datasets[2]).Add(double.Parse(water.Temperature));
+        }
+        _chart.Update();
+    }
+
+    private async void WaterChanged(object sender, WaterChangeEventArgs args)
+    {
+        var recordToupdate = this.waters.FirstOrDefault(x => x.ID == args.NewWater.ID);
+
+        if (recordToupdate == null)
+        {
+            this.waters.Add(args.NewWater);
+        }
+        else
+        {
+            recordToupdate.Waterflow = args.NewWater.Waterflow;
+            recordToupdate.Temperature = args.NewWater.Temperature;
+            recordToupdate.PH = args.NewWater.PH;
+            recordToupdate.Turbidity = args.NewWater.Turbidity;
+
+        }
+        LoadChart();
+        await InvokeAsync(() =>
+        {
+            base.StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        this._waterService.OnWaterChanged -= this.WaterChanged;
+    }
+}
 
