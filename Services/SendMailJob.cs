@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿using Microsoft.Extensions.Configuration;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace WebDoAn.Services
     {
         private readonly IWaterService _waterService;
         private readonly IMailService _mailService;
-        public SendMailJob(IWaterService ws, IMailService mailService)
+        private readonly IConfiguration _configuration;
+        public SendMailJob(IWaterService ws, IMailService mailService, IConfiguration configuration)
         {
             _waterService = ws;
             _mailService = mailService;
+            _configuration = configuration;
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -29,7 +32,7 @@ namespace WebDoAn.Services
 
             var mailResquest = new MailRequest
             {
-                ToEmail = "ntduong151099@gmail.com",
+                ToEmail = _configuration["ToMail"].ToString(),
                 Body = $"Thống kê quản lý nguồn nước ngày {DateTime.Today.ToString("dd/MM/yyyy")}",
                 Subject = $"Thống kê quản lý nguồn nước ngày {DateTime.Today.ToString("dd/MM/yyyy")}"
             };
