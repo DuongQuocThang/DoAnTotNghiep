@@ -6,13 +6,16 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebDoAn.Data;
+using WebDoAn.Extensions;
 using WebDoAn.Interfaces;
 using WebDoAn.Services;
+using WebDoAn.Settings;
 
 namespace WebDoAn
 {
@@ -29,6 +32,16 @@ namespace WebDoAn
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
+            services.AddTransient<IMailService, Services.MailService>();
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionScopedJobFactory();
+                q.AddJobAndTrigger<SendMailJob>(Configuration);
+
+            });
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
             services.AddSingleton<IWaterService, WaterService>();
             services.AddRazorPages();
             services.AddServerSideBlazor();

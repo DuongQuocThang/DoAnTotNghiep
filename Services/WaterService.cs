@@ -61,7 +61,7 @@ namespace WebDoAn.Services
 
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT * FROM " + TableName +" WHERE Time >='"+startDate.ToString("yyyy-MM-dd") + "' AND "+"Time <='"+endDate.ToString("yyyy-MM-dd") + "'";
+                    command.CommandText = "SELECT * FROM " + TableName +" WHERE Time >='"+startDate.ToString() + "' AND "+"Time <'"+endDate.AddHours(24).ToString() + "'";
                     command.CommandType = CommandType.Text;
 
                     using (SqlDataReader reader = command.ExecuteReader())
