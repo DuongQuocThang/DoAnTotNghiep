@@ -8,7 +8,7 @@ namespace WebDoAn.Models
     public class WaterData
     {
         public int ID { get; set; }
-        public string MessageId { get; set; }
+        public int MessageId { get; set; }
         public DateTime Time { get; set; }
         public string Temperature { get; set; }
         public string TemperatureF { 

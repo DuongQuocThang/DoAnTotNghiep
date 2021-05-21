@@ -73,7 +73,7 @@ namespace WebDoAn.Services
                                 result.Add(new WaterData
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                                    MessageId = reader.GetString(reader.GetOrdinal("MessageId")),
+                                    MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
                                     Time = reader.GetDateTime(reader.GetOrdinal("Time")),
                                     Temperature = reader.GetString(reader.GetOrdinal("Temperature")),
                                     Turbidity = reader.GetString(reader.GetOrdinal("Turbidity")),
@@ -110,7 +110,7 @@ namespace WebDoAn.Services
                                 result.Add(new WaterData
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                                    MessageId = reader.GetString(reader.GetOrdinal("MessageId")),
+                                    MessageId = int.Parse(reader.GetString(reader.GetOrdinal("MessageId"))),
                                     Time = reader.GetDateTime(reader.GetOrdinal("Time")),
                                     Temperature = reader.GetString(reader.GetOrdinal("Temperature")),
                                     Turbidity = reader.GetString(reader.GetOrdinal("Turbidity")),
