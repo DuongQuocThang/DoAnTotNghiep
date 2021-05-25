@@ -1,4 +1,5 @@
 ﻿@page "/administration"
+@attribute [Authorize(Roles = "Administrators")]
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.Extensions.Configuration;
@@ -102,40 +103,44 @@
                     </div>
                 </div>
             }
-            <button class="btn btn-success" @onclick="AddNewUser">Add User</button>
+            <button class="btn btn-success" @onclick="AddNewUser">Thêm người dùng</button>
         }
         else
         {
-            <p>You're not signed in as a user in @ADMINISTRATION_ROLE.</p>
+            <p>Bạn không đăng nhập với quyền @ADMINISTRATION_ROLE.</p>
         }
     </Authorized>
     <NotAuthorized>
-        <p>You're not loggged in.</p>
+        <p>Bạn chưa đăng nhập</p>
     </NotAuthorized>
 </AuthorizeView>
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     string ADMINISTRATION_ROLE = "Administrators";
+    string SUPERVISOR_ROLE = "Supervisor";
     System.Security.Claims.ClaimsPrincipal CurrentUser;
 
     IdentityUser objUser = new IdentityUser();
     string CurrentUserRole { get; set; } = "Users";
     List<IdentityUser> ColUsers = new List<IdentityUser>();
-    List<string> Options = new List<string>() { "Users", "Administrators" };
+    List<string> Options = new List<string>() { "Users", "Administrators", "Supervisor" };
     string strError = "";
     bool ShowPopup = false;
 
     protected override async Task OnInitializedAsync()
     {
-
-
-        // ensure there is a ADMINISTRATION_ROLE
         var RoleResult = await _RoleManager.FindByNameAsync(ADMINISTRATION_ROLE);
+        var RoleSup = await _RoleManager.FindByNameAsync(SUPERVISOR_ROLE);
         if (RoleResult == null)
         {
-            // Create ADMINISTRATION_ROLE Role
             await _RoleManager.CreateAsync(new IdentityRole(ADMINISTRATION_ROLE));
+
+        }
+        if (RoleSup == null)
+        {
+            await _RoleManager.CreateAsync(new IdentityRole(SUPERVISOR_ROLE));
+
         }
         // Ensure a user named Admin@BlazorHelpWebsite.com is an Administrator
         var user = await _UserManager.FindByNameAsync(Configuration["AdminUsername"]);

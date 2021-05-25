@@ -1,5 +1,5 @@
 ﻿@page "/Event"
-
+@attribute [Authorize(Roles = "Administrators, Supervisor")]
 @using WebDoAn.Data
 <div class="row">
     <div class="col-xl-9 pr-xl-2">
@@ -11,7 +11,7 @@
                     <p class="stat-text">SĐT người dùng: 0987274652 </p>
                 </div>
             </div>
-            
+
         </div>
     </div>
     <div class="col-xl-9 pr-xl-2">

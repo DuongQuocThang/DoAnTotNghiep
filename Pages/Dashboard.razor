@@ -1,4 +1,5 @@
 ﻿@page "/Dashboard"
+@attribute [Authorize(Roles = "Administrators, Supervisor")]
 @using ChartJs.Blazor.BarChart
 @using ChartJs.Blazor
 @using ChartJs.Blazor.Common
@@ -46,7 +47,7 @@
                             </div>
                             <div class="col-sm-6 pl-sm-2 statistics-grid">
                                 <div class="card card_border border-primary-top p-4">
-                                    @if(double.Parse(currentWater.PH)>=8.0 || double.Parse(currentWater.PH) < 4.0)
+                                    @if (double.Parse(currentWater.PH) >= 8.0 || double.Parse(currentWater.PH) < 4.0)
                                     {
                                         <i style="color:red" class="lnr lnr-warning"> </i>
 
