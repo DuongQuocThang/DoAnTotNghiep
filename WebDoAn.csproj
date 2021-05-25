@@ -1,19 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BlazorDownloadFile" Version="2.1.6" />
-    <PackageReference Include="bootstrap" Version="5.0.0-beta3" />
-    <PackageReference Include="Chart.js" Version="2.9.3" />
-    <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
-    <PackageReference Include="FontAwesome" Version="4.7.0" />
-    <PackageReference Include="LineChart" Version="1.0.1" />
-    <PackageReference Include="MailKit" Version="2.12.0" />
-    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.2" />
-    <PackageReference Include="SqlTableDependency" Version="8.5.8" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BlazorDownloadFile" Version="2.1.6" />
+		<PackageReference Include="bootstrap" Version="5.0.0-beta3" />
+		<PackageReference Include="Chart.js" Version="2.9.3" />
+		<PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
+		<PackageReference Include="FontAwesome" Version="4.7.0" />
+		<PackageReference Include="LineChart" Version="1.0.1" />
+		<PackageReference Include="MailKit" Version="2.12.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.2" />
+		<PackageReference Include="SqlTableDependency" Version="8.5.8" />
+
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10" />
+	</ItemGroup>
 
 </Project>

@@ -1,0 +1,12 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <a href="Identity/Account/Manage">Xin chào, @context.User.Identity.Name!</a>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Đăng xuất</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Đăng ký tài khoản</a>
+        <a href="Identity/Account/Login">Đăng nhập</a>
+    </NotAuthorized>
+</AuthorizeView>
