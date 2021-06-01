@@ -23,7 +23,10 @@ namespace WebDoAn.Services
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
-            email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
+            foreach (var item in mailRequest.ToEmails)
+            {
+                email.To.Add(MailboxAddress.Parse(item));
+            }
             email.Subject = mailRequest.Subject;
             var builder = new BodyBuilder();
             if (mailRequest.Attachments != null)

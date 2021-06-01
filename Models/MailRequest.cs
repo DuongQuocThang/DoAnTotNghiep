@@ -8,7 +8,7 @@ namespace WebDoAn.Models
 {
     public class MailRequest
     {
-        public string ToEmail { get; set; }
+        public List<string> ToEmails { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
         public List<Attachment> Attachments { get; set; }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,31 @@ namespace WebDoAn.Services
         private readonly IWaterService _waterService;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
-        public SendMailJob(IWaterService ws, IMailService mailService, IConfiguration configuration)
+        private readonly UserManager<IdentityUser> _userManager;
+        public SendMailJob(IWaterService ws, IMailService mailService, IConfiguration configuration, UserManager<IdentityUser> userManager)
         {
             _waterService = ws;
             _mailService = mailService;
             _configuration = configuration;
+            _userManager = userManager;
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
+            var adminUser = await _userManager.GetUsersInRoleAsync("Administrators");
+            var SupUser = await _userManager.GetUsersInRoleAsync("Supervisor");
+            List<string> email = new List<string>();
+            foreach (var admin in adminUser)
+            {
+                email.Add(admin.Email);
+            }
+
+            foreach (var sup in SupUser)
+            {
+                email.Add(sup.Email);
+            }
+
+
             var file = new Attachment
             {
                 fileName = $"Statistical{DateTime.Today.ToString("dd-MM-yyyy")}.csv",
@@ -32,7 +49,7 @@ namespace WebDoAn.Services
 
             var mailResquest = new MailRequest
             {
-                ToEmail = _configuration["ToMail"].ToString(),
+                ToEmails = email,
                 Body = $"Thống kê quản lý nguồn nước ngày {DateTime.Today.ToString("dd/MM/yyyy")}",
                 Subject = $"Thống kê quản lý nguồn nước ngày {DateTime.Today.ToString("dd/MM/yyyy")}"
             };
@@ -40,7 +57,6 @@ namespace WebDoAn.Services
             mailResquest.Attachments.Add(file);
             _mailService.SendEmail(mailResquest);
 
-            return Task.CompletedTask;
         }
 
         public string StatisticalCal()
