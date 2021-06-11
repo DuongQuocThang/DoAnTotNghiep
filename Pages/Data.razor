@@ -179,7 +179,7 @@ else
         {
             buildler.AppendLine($"{water.Time.ToString("dd/MM/yyyy HH:mm:ss")},{water.MessageId},{water.Temperature},{water.TemperatureF},{water.Turbidity},{water.PH},{water.Waterflow}");
         }
-        await BlazorDownloadFileService.DownloadFileFromText($"water{startDate.ToString("dd-MM-yyyy")}to{endDate.ToString("dd-MM-yyyy")}.csv", buildler.ToString(), "text/csv");
+        await BlazorDownloadFileService.DownloadFileFromText($"Dữ liệu từ {startDate.ToString("dd-MM-yyyy")} đến {endDate.ToString("dd-MM-yyyy")}.csv", buildler.ToString(), "text/csv");
     }
     //export file
     public async Task StatisticalExport()
@@ -213,17 +213,17 @@ else
 
         for (int i = 0; i < listWater.Count; i++)
         {
-            if (int.Parse(listWater[i].PH) >= 8)
+            if (int.Parse(listWater[i].PH) >= 9)
             {
                 Warning warningItem = new Warning
                 {
                     startTime = listWater[i].Time,
                     endTime = listWater[i].Time,
-                    Message = "pH >=8 Chỉ số vượt quá mức quy định"
+                    Message = "pH >=9 Chỉ số vượt quá mức quy định"
                 };
                 for (int j = i + 1; j < listWater.Count; j++)
                 {
-                    if (int.Parse(listWater[j].PH) < 8 || j == listWater.Count - 1)
+                    if (int.Parse(listWater[j].PH) < 9 || j == listWater.Count - 1)
                     {
                         warningItem.endTime = listWater[j - 1].Time;
                         i = j - 1;
@@ -232,17 +232,17 @@ else
                 }
                 warnings.Add(warningItem);
             }
-            else if (int.Parse(listWater[i].PH) <= 4)
+            else if (int.Parse(listWater[i].PH) <= 6)
             {
                 Warning warningItem = new Warning
                 {
                     startTime = listWater[i].Time,
                     endTime = listWater[i].Time,
-                    Message = "pH <= 4 Chỉ số vượt tiêu chuẩn cho phép"
+                    Message = "pH <= 6 Chỉ số vượt tiêu chuẩn cho phép"
                 };
                 for (int j = i + 1; j < listWater.Count; j++)
                 {
-                    if (int.Parse(listWater[j].PH) > 4 || j == listWater.Count - 1)
+                    if (int.Parse(listWater[j].PH) > 6 || j == listWater.Count - 1)
                     {
                         warningItem.endTime = listWater[j - 1].Time;
                         i = j - 1;

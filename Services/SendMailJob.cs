@@ -43,7 +43,7 @@ namespace WebDoAn.Services
 
             var file = new Attachment
             {
-                fileName = $"Statistical{DateTime.Today.ToString("dd-MM-yyyy")}.csv",
+                fileName = $"Thống kê {DateTime.Today.ToString("dd-MM-yyyy")}.csv",
                 Data = StatisticalCal()
             };
 
@@ -71,17 +71,17 @@ namespace WebDoAn.Services
 
             for (int i = 0; i < listWater.Count; i++)
             {
-                if (int.Parse(listWater[i].PH) >= 8)
+                if (int.Parse(listWater[i].PH) >= 9)
                 {
                     Warning warningItem = new Warning
                     {
                         startTime = listWater[i].Time,
                         endTime = listWater[i].Time,
-                        Message = "pH >=8 Chỉ số vượt quá mức quy định"
+                        Message = "pH >=9 Chỉ số vượt quá mức quy định"
                     };
                     for (int j = i + 1; j < listWater.Count; j++)
                     {
-                        if (int.Parse(listWater[j].PH) < 8 || j == listWater.Count - 1)
+                        if (int.Parse(listWater[j].PH) < 9 || j == listWater.Count - 1)
                         {
                             warningItem.endTime = listWater[j - 1].Time;
                             i = j - 1;
@@ -90,17 +90,17 @@ namespace WebDoAn.Services
                     }
                     warnings.Add(warningItem);
                 }
-                else if (int.Parse(listWater[i].PH) <= 4)
+                else if (int.Parse(listWater[i].PH) <= 6)
                 {
                     Warning warningItem = new Warning
                     {
                         startTime = listWater[i].Time,
                         endTime = listWater[i].Time,
-                        Message = "pH <= 4 Chỉ số vượt tiêu chuẩn cho phép"
+                        Message = "pH <= 6 Chỉ số vượt tiêu chuẩn cho phép"
                     };
                     for (int j = i + 1; j < listWater.Count; j++)
                     {
-                        if (int.Parse(listWater[j].PH) > 4 || j == listWater.Count - 1)
+                        if (int.Parse(listWater[j].PH) > 6 || j == listWater.Count - 1)
                         {
                             warningItem.endTime = listWater[j - 1].Time;
                             i = j - 1;

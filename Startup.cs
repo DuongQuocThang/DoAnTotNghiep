@@ -18,7 +18,7 @@ using WebDoAn.Extensions;
 using WebDoAn.Interfaces;
 using WebDoAn.Services;
 using WebDoAn.Settings;
-
+using Microsoft.AspNetCore.Mvc;
 namespace WebDoAn
 {
     public class Startup
@@ -34,6 +34,7 @@ namespace WebDoAn
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0); // Added
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration["ConnectionString"]));
@@ -58,7 +59,7 @@ namespace WebDoAn
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazorDownloadFile();
-
+            services.AddSingleton<TelemetryService>();
             services.AddSingleton<WeatherForecastService>();
         }
 
@@ -84,7 +85,7 @@ namespace WebDoAn
             app.UseAuthentication();
             app.UseAuthorization();
 
-
+            app.UseMvcWithDefaultRoute(); // Added
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
