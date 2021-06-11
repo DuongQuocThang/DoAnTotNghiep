@@ -8,7 +8,9 @@
 @using WebDoAn.Interfaces
 @using WebDoAn.Models
 @using WebDoAn.Services
+@using WebDoAn.Data
 @inject IWaterService _waterService
+@inject TelemetryService TelemetryService
 <section>
     <!-- sidebar menu start -->
     <div class="sidebar-menu sticky-sidebar-menu">
@@ -113,9 +115,26 @@
     BarDataset<double> pHDataSet;
     BarDataset<double> temDataSet;
     WaterData currentWater;
+    private string temp;
+    private string turb;
+    private string ph;
+    private string flow;
 
+    private void OnInputTelemetryReceived(object sender, TelemetryDataPoint telemetryDataPoint)
+    {
+        /*message = $"Temperature: {telemetryDataPoint.temperature} - Humidity: {telemetryDataPoint.humidity}"*/
+        ;
+        temp = $"{telemetryDataPoint.Temperature}";
+        turb = $"{telemetryDataPoint.Turbidity}";
+        ph = $"{telemetryDataPoint.PH}";
+        flow = $"{telemetryDataPoint.Waterflow}";
+        InvokeAsync(() => StateHasChanged());
+    }
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
+        TelemetryService.InputMessageReceived += OnInputTelemetryReceived;
         // Subscription to table record change events
         this._waterService.OnWaterChanged += this.WaterChanged;
         this.waters = this._waterService.GetCurrentWater();
