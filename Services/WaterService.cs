@@ -61,7 +61,7 @@ namespace WebDoAn.Services
 
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT * FROM " + TableName +" WHERE Time >='"+startDate.ToString() + "' AND "+"Time <'"+endDate.AddHours(24).ToString() + "'";
+                    command.CommandText = "SELECT * FROM " + TableName + " WHERE Time >='" + startDate.ToString() + "' AND " + "Time <'" + endDate.AddHours(24).ToString() + "'";
                     command.CommandType = CommandType.Text;
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -73,6 +73,7 @@ namespace WebDoAn.Services
                                 result.Add(new WaterData
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                    DeviceId = reader.GetString(reader.GetOrdinal("DeviceId")),
                                     MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
                                     Time = reader.GetDateTime(reader.GetOrdinal("Time")),
                                     Temperature = reader.GetString(reader.GetOrdinal("Temperature")),
@@ -110,7 +111,8 @@ namespace WebDoAn.Services
                                 result.Add(new WaterData
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                                    MessageId = int.Parse(reader.GetString(reader.GetOrdinal("MessageId"))),
+                                    DeviceId = reader.GetString(reader.GetOrdinal("DeviceId")),
+                                    MessageId = reader.GetInt32(reader.GetOrdinal("MessageId")),
                                     Time = reader.GetDateTime(reader.GetOrdinal("Time")),
                                     Temperature = reader.GetString(reader.GetOrdinal("Temperature")),
                                     Turbidity = reader.GetString(reader.GetOrdinal("Turbidity")),
